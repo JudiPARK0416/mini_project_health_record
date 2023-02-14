@@ -1,0 +1,62 @@
+{
+  "data": [
+    {
+      "id": "9fa453ef-edb7-43c3-97ef-a53ebc16cc4d",
+      "name": "위 내시경",
+      "date": "2023-02-14",
+      "classification": "건강검진",
+      "hospital": "이대서울병원",
+      "department": "감염내과",
+      "done": true
+    },
+    {
+      "id": "e12af3df-c741-493c-b23a-8f29a7d773cb",
+      "name": "코로나 4차 접종",
+      "date": "2023-02-14",
+      "classification": "예방접종",
+      "hospital": "서울대학교병원",
+      "department": "감염내과",
+      "done": false
+    },
+    {
+      "id": "57b021d2-8b68-4241-bd63-1829e47bad6a",
+      "name": "심근경색",
+      "date": "2023-02-08",
+      "classification": "기타내원",
+      "hospital": "서울대학교병원",
+      "department": "응급의학과",
+      "done": true
+    },
+    {
+      "id": "d2cdc6b6-84f0-4323-9c3d-7e3a70f4d648",
+      "name": "고혈압 약 처방",
+      "date": "2023-03-02",
+      "classification": "만성질환",
+      "hospital": "고려대학교병원",
+      "department": "순환기내과",
+      "done": false
+    }
+  ],
+  "myInfo": {
+    "name": "지겨워",
+    "dob": "1996-04-09",
+    "sex": "M",
+    "bloodType": "O+",
+    "allergy": "복숭아 껍질",
+    "diagnosed": "부정맥",
+    "medicalRecord": "광기",
+    "weight": "486",
+    "height": "154.8",
+    "emergenctContact": "01022222222",
+    "hospital": [
+      "이대서울병원",
+      "서울대학교병원",
+      "고려대학교병원"
+    ],
+    "department": [
+      "감염내과",
+      "응급의학과",
+      "순환기내과"
+    ]
+  }
+}

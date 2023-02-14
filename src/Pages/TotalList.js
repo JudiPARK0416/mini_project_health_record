@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../Footer";
 import Header from "../Header";
 import styled from "styled-components";
+import TodoForm from "../TodoForm";
+import EditTodo from "../EditTodo";
 
 export const TotalListContainer = styled.main`
   display: flex;
@@ -21,32 +23,56 @@ export const TodoBtn = styled.button`
   font-size: 2rem;
   margin-right: 30px;
   font-weight: bold;
-`;
-export const AddBtn = styled.button`
-  width: 100px;
-  height: 100px;
-  border-radius: 50px;
-  font-size: 4rem;
-  margin-right: 30px;
+  border: none;
+  &.green {
+    &.done {
+      background-color: white;
+      color: green;
+      border: 5px solid green;
+    }
+    &.todo {
+      background-color: green;
+      color: white;
+    }
+  }
+  &.orange {
+    &.done {
+      background-color: white;
+      color: orange;
+      border: 5px solid orange;
+    }
+    &.todo {
+      background-color: orange;
+      color: white;
+    }
+  }
+  &.red {
+    &.done {
+      background-color: white;
+      color: red;
+      border: 5px solid red;
+    }
+    &.todo {
+      background-color: red;
+      color: white;
+    }
+  }
+  &.blue {
+    &.done {
+      background-color: white;
+      color: blue;
+      border: 5px solid blue;
+    }
+    &.todo {
+      background-color: blue;
+      color: white;
+    }
+  }
 `;
 export const ContentName = styled.h2`
   font-size: 3rem;
   margin: 0;
   padding-bottom: 2px;
-`;
-export const StyledInputName = styled.input`
-  font-size: 3rem;
-  width: 520px;
-  border-radius: 5px;
-  border: none;
-  background: #dcdcdc;
-  ::placeholder {
-    padding: 5px;
-    color: #aeadad;
-  }
-  font-weight: bold;
-  margin: 3px;
-  flex-grow: 1;
 `;
 export const Smallest = styled.span`
   font-weight: bold;
@@ -58,7 +84,6 @@ export const MoreInfoUpper = styled.div`
   flex-direction: column;
   span {
     width: 250px;
-
     padding-bottom: 2px;
   }
 `;
@@ -69,21 +94,8 @@ export const MoreInfoLower = styled.div`
   justify-content: space-between;
   span {
     width: 250px;
-
     text-align: justify;
   }
-`;
-export const InputContainerRight = styled.div`
-  font-size: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-export const InputContainerLeft = styled.div`
-  font-size: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
 `;
 export const ContentUpper = styled.div`
   display: flex;
@@ -96,125 +108,183 @@ export const ContentSection = styled.section`
   flex-direction: column;
   width: 900px;
 `;
-export const InputContentSection = styled.section`
+export const More = styled.i`
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
-`;
-export const More = styled.span`
-  font-size: 3rem;
+  font-size: 2rem;
   padding: 0 20px;
-`;
-export const FormContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  padding: 10px 30px;
-
-  border-bottom: 2px solid #d0d0d0;
+  border: none;
+  background-color: white;
+  color: #d9d9d9;
+  :hover {
+    color: gray;
+  }
 `;
 export const ContainerDiv = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 10px 30px;
+  padding: 10px 20px 10px 40px;
   border-bottom: 2px solid #d0d0d0;
   left: 0;
 `;
-export const StyledInput = styled.input`
-  font-size: 1.5rem;
-  border: none;
-  background: #dcdcdc;
-  height: 40px;
-  border-radius: 5px;
-  font-weight: bold;
-  color: #aeadad;
-  margin: 3px;
-  padding: 5px;
+export const StyledScroll = styled.div`
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;
-export const StyledSelect = styled.select`
-  font-size: 1.5rem;
-  border: none;
-  background: #dcdcdc;
-  color: #aeadad;
-  font-weight: bold;
-  height: 40px;
-  border-radius: 5px;
-  width: 400px;
-  margin: 3px;
-  padding: 5px;
+//! 여기 모달
+export const ModalBackdrop = styled.div`
+  background-color: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
 `;
+//! 여기 모달
 
 const TotalList = ({ todoList, setTodoList, myInfo }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  // const [edited, setEdited] = useState({});
+  // const [last, setLast] = useState(false);
+
+  // useEffect(() => {
+  //   if (edited[0]) setLast(!last);
+  //   if (edited[0] && isOpen === false) {
+  //     setEdited({});
+  //     setLast(!last);
+  //   }
+  // }, [isOpen]);
+
+  const handleDeleteClick = (e) => {
+    fetch(`http://localhost:3005/data/${e.target.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then(() => {
+        setTodoList(todoList.filter((todo) => todo.id !== e.target.id));
+      })
+      .catch((err) => console.log(err));
+  };
+  const handleChange = (e) => {
+    let editingTodo = todoList.filter((todo) => e.target.id === todo.id)[0];
+    fetch(`http://localhost:3005/data/${e.target.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        ...editingTodo,
+        done: editingTodo.done === true ? false : true,
+      }),
+    })
+      .then(() => {
+        setTodoList(
+          todoList.map((todo) => {
+            if (todo.id === e.target.id) {
+              if (todo.done === true) todo.done = false;
+              else todo.done = true;
+            }
+            return todo;
+          })
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+  const openModalHandler = (e) => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <>
       <TotalListContainer>
-        <Header text={"전체"}num={todoList.length}/>
+        <Header text={"전체"} num={`${todoList.length} 건`} />
         <TotalListMain>
-          <FormContainer>
-            <AddBtn>+</AddBtn>
-            <InputContentSection>
-              <InputContainerLeft>
-                <StyledInputName placeholder="제목을 입력하세요" />
-                <MoreInfoUpper>
-                  <StyledInput type="datetime-local" />
-                </MoreInfoUpper>
-              </InputContainerLeft>
-              <InputContainerRight>
-                <StyledSelect>
-                  <option value="">분류를 입력하세요</option>
-                  <option value="건강검진">건강검진</option>
-                  <option value="예방접종">예방접종</option>
-                  <option value="기타내원">기타내원</option>
-                  <option value="만성질환">만성질환</option>
-                </StyledSelect>
-                <StyledSelect>
-                  <option value="">병원명을 입력하세요</option>
-                  {myInfo.hospital.map((e,i)=><option key={i} value={`${e}`}>{e}</option>)}
-                </StyledSelect>
-                <StyledSelect>
-                  <option value="">진료과를 입력하세요</option>
-                  {myInfo.department.map((e,i)=><option key={i} value={`${e}`}>{e}</option>)}
-                </StyledSelect>
-              </InputContainerRight>
-            </InputContentSection>
-          </FormContainer>
-          <div>
-            {todoList.map((todo, idx)=>
-            <ContainerDiv key={idx}>
-              <TodoBtn>TODO</TodoBtn>
-              <ContentSection>
-                <ContentUpper>
-                  <ContentName>{todo.name}</ContentName>
-                  <span>
-                    <MoreInfoUpper>
-                      <span>
-                        <Smallest>내원사유</Smallest> {todo.classification}
-                      </span>
-                      <span>
-                        <Smallest>결과</Smallest> -
-                      </span>
-                    </MoreInfoUpper>
-                  </span>
-                </ContentUpper>
-                <MoreInfoLower>
-                  <span>
-                    <Smallest>날짜</Smallest> {todo.date}
-                  </span>
-                  <span>
-                    <Smallest>병원명</Smallest> {todo.hospital}
-                  </span>
-                  <span>
-                    <Smallest>진료과</Smallest> {todo.department}
-                  </span>
-                </MoreInfoLower>
-              </ContentSection>
-              <More>
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-              </More>
-            </ContainerDiv>)}
-          </div>
+          <TodoForm
+            todoList={todoList}
+            setTodoList={setTodoList}
+            myInfo={myInfo}
+          />
+          <StyledScroll>
+            {todoList.map((todo, idx, todoList) => (
+              <ContainerDiv myInfo={myInfo} key={todo.id}>
+                <TodoBtn
+                  id={todo.id}
+                  onClick={handleChange}
+                  className={`${
+                    todo.classification === "건강검진"
+                      ? "green"
+                      : todo.classification === "예방접종"
+                      ? "orange"
+                      : todo.classification === "기타내원"
+                      ? "red"
+                      : todo.classification === "만성질환"
+                      ? "blue"
+                      : "black"
+                  } ${todo.done === true ? "done" : "todo"}`}
+                >
+                  {todo.done === true ? "DONE" : "TODO"}
+                </TodoBtn>
+                <ContentSection>
+                  <ContentUpper>
+                    <ContentName>{todo.name}</ContentName>
+                    <span>
+                      <MoreInfoUpper>
+                        <span>
+                          <Smallest>내원사유</Smallest> {todo.classification}
+                        </span>
+                        <span>
+                          <Smallest>결과</Smallest> -
+                        </span>
+                      </MoreInfoUpper>
+                    </span>
+                  </ContentUpper>
+                  <MoreInfoLower>
+                    <span>
+                      <Smallest>날짜</Smallest> {todo.date}
+                    </span>
+                    <span>
+                      <Smallest>병원명</Smallest> {todo.hospital}
+                    </span>
+                    <span>
+                      <Smallest>진료과</Smallest> {todo.department}
+                    </span>
+                  </MoreInfoLower>
+                </ContentSection>
+                <More
+                  onClick={openModalHandler}
+                  id={todo.id}
+                  className="fa-solid fa-ellipsis-vertical"
+                >
+                  {isOpen ? (
+                    <ModalBackdrop onClick={openModalHandler}>
+                      <EditTodo
+                        todo={todo}
+                        todoList={todoList}
+                        setTodoList={setTodoList}
+                        myInfo={myInfo}
+                        isOpen={isOpen}
+                        setIsOpen={setIsOpen}
+                      />
+                    </ModalBackdrop>
+                  ) : null}
+                </More>
+                <More
+                  onClick={handleDeleteClick}
+                  id={todo.id}
+                  className="fa-solid fa-trash-can"
+                />
+              </ContainerDiv>
+            ))}
+          </StyledScroll>
         </TotalListMain>
         <Footer />
       </TotalListContainer>

@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+
 export const StyledFooter = styled.footer`
   height: 57px;
   background: #e9e9e9;
